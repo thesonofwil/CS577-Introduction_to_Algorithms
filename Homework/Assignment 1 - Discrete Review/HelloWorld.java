@@ -1,23 +1,23 @@
 import java.util.Scanner;
+import java.util.ArrayList;
 
 public class HelloWorld {
     public static void main(String [] args) {
         Scanner input = new Scanner(System.in);
-        String[] strings = {};
+        ArrayList<String> strings = new ArrayList<String>();
     
         int n = input.nextInt(); // Get integer
 
         // Store string inputs
-        int i = 0;
         while (n > 0) { 
             String s = input.nextLine();
-            strings[i] = s;
+            strings.add(s);
             n--;
-            i++;
         }
 
-        for (int j = 0; j < strings.length; j++) { 
-            System.out.println("Hello, " + strings[j] + "!");
+        // Print strings
+        for (String i : strings) { 
+            System.out.println("Hello, " + i + "!");
         }
 
         input.close();
