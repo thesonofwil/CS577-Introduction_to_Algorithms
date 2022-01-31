@@ -1,5 +1,6 @@
 build:
-	g++ -o HelloWorld HelloWorld.cpp
-
+#	g++ -o HelloWorld HelloWorld.cpp
+	javac HelloWorld.java
 run:
-	./HelloWorld 
+#	./HelloWorld
+	java HelloWorld 

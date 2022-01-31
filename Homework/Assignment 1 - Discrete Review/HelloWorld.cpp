@@ -41,7 +41,8 @@ int main() {
 
     // Print strings
     for (string i : strings) {
-        cout << "Hello, " + i + "!" + '\n';
+
+        cout << "Hello, " + i + "!";
     }
 
     return 1;

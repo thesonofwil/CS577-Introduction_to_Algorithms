@@ -6,11 +6,12 @@ public class HelloWorld {
         Scanner input = new Scanner(System.in);
         ArrayList<String> strings = new ArrayList<String>();
     
-        int n = input.nextInt(); // Get integer
+        int n = Integer.parseInt(input.nextLine()); // Get integer
 
         // Store string inputs
         while (n > 0) { 
-            String s = input.nextLine();
+            
+	    String s = input.nextLine();
             strings.add(s);
             n--;
         }
