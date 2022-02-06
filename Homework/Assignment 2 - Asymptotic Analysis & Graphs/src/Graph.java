@@ -17,17 +17,13 @@ import java.util.Set;
 
 public class Graph {
 
-    private static Set<Vertex> vertices;
-    private int numVertices;
-    private int numEdges;
+    private List<Vertex> vertices;
 
     /*
      * Default no-argument constructor
      */
     public Graph() {
-        vertices = new HashSet<Vertex>();
-        numVertices = 0;
-        numEdges = 0;
+        vertices = new ArrayList<Vertex>();
     }
 
     /**
@@ -38,7 +34,7 @@ public class Graph {
      */
     private class Vertex {
         String data;
-        List<Vertex> adjacencies; // neighbors of the vertex
+        List<String> adjacencies; // neighbors of the vertex
 
         /**
          * Vertex constructor 
@@ -47,7 +43,7 @@ public class Graph {
          */
         Vertex (String s) {
             this.data = s;
-            adjacencies = new ArrayList<Vertex>();
+            adjacencies = new ArrayList<String>();
         }
     }
 
@@ -69,7 +65,6 @@ public class Graph {
 
         Vertex v = new Vertex(vertex);
         vertices.add(v);
-        numVertices++;
     }
 
     /**
@@ -100,12 +95,7 @@ public class Graph {
         Vertex v1 = getVertex(vertex1);
         Vertex v2 = getVertex(vertex2);
 
-        if (hasDependency(v1, v2)) { // There is already an edge
-            return;
-        }
-
         v1.adjacencies.add(v2);
-        numEdges++;
     }
 
     /**
@@ -157,21 +147,13 @@ public class Graph {
     }
 
     /**
-     * Returns the number of edges in this graph.
-     *
-     * @return number of edges in the graph.
+     * Gets the first vertex in the graph, which should be lexographically the least
+     * 
+     * @return the first vertex
      */
-    public int size() {
-        return numEdges;
-    }
-
-    /**
-     * Returns the number of vertices in this graph.
-     *
-     * @return number of vertices in graph.
-     */
-    public int order() {
-        return numVertices;
+    public String getFirstVertex() {
+        Vertex v = vertices.get(0);
+        return v.data;
     }
 
     /////---------------- Private Helper Methods ----------------\\\\\
@@ -183,7 +165,7 @@ public class Graph {
      * @return true if graph has a vertex with the given string; false otherwise
      */
     private boolean hasVertex(String data) {
-
+        
         for (Vertex v : vertices) {
             if (v.data.equals(data)) {
                 return true;
@@ -207,22 +189,5 @@ public class Graph {
         }
 
         return null;
-    }
-
-    /**
-     * Checks if there is a direct dependency between v1 and v2 i.e v1 -> v2
-     *
-     * @param v1 the source vertex 
-     * @param v2 the target vertex
-     * @return true if v1 points to v2; false otherwise
-     */
-    private boolean hasDependency(Vertex v1, Vertex v2) {
-        for (Vertex v : v1.adjacencies) {
-            if (v.equals(v2)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 }
