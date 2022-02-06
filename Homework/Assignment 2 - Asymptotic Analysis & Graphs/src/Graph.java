@@ -1,8 +1,5 @@
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Filename:   Graph.java
@@ -18,12 +15,14 @@ import java.util.Set;
 public class Graph {
 
     private List<Vertex> vertices;
+    private List<String> verticesData;
 
     /*
      * Default no-argument constructor
      */
     public Graph() {
         vertices = new ArrayList<Vertex>();
+        verticesData = new ArrayList<String>();
     }
 
     /**
@@ -59,26 +58,14 @@ public class Graph {
      * 2. vertex is not already in the graph 
      */
     public void addVertex(String vertex) {
-        if (vertex == null || hasVertex(vertex)) {
-            return;
-        }
-
         Vertex v = new Vertex(vertex);
         vertices.add(v);
+        verticesData.add(vertex);
     }
 
     /**
-     * Add the edge from vertex1 to vertex2
-     * to this graph.
-     * If either vertex does not exist,
-     * add vertex, and add edge, no exception is thrown.
-     * If the edge exists in the graph,
-     * no edge is added and no exception is thrown.
+     * Updates the adjacency list of vertex1 by adding vertex2 to it.
      *
-     * Valid argument conditions:
-     * 1. neither vertex is null
-     * 2. both vertices are in the graph 
-     * 3. the edge is not in the graph
      */
     public void addEdge(String vertex1, String vertex2) {
 
@@ -86,64 +73,17 @@ public class Graph {
             return;
         }
 
-        // Add vertices if they don't exist
-        // addVertex already checks for existence
-        addVertex(vertex1);
-        addVertex(vertex2);
-
         // Get vertex nodes
         Vertex v1 = getVertex(vertex1);
-        Vertex v2 = getVertex(vertex2);
-
-        v1.adjacencies.add(v2);
+        v1.adjacencies.add(vertex2);
     }
 
     /**
-     * Returns a Set that contains all the vertices
+     * Returns a List that contains all the vertices
      *
      */
-    public Set<String> getAllVertices() {
-        Set<String> set = new HashSet<String>();
-
-        for (Vertex v : vertices) {
-            set.add(v.data);
-        }
-
-        return set;
-    }
-
-    /**
-     * Get all the neighbor (adjacent-adjacencies) of a vertex
-     *
-     * For the example graph, A->[B, C], D->[A, B] 
-     *     getAdjacentVerticesOf(A) should return [B, C]. 
-     *
-     * In terms of packages, this list contains the immediate 
-     * adjacencies of A and depending on your graph structure, 
-     * this could be either the predecessors or successors of A.
-     *
-     * @param vertex the specified vertex
-     * @return an List<String> of all the adjacent vertices for specified vertex
-     */
-    public List<String> getAdjacentVerticesOf(String vertex) {
-
-        // Vertex not in graph
-        if (!hasVertex(vertex)) {
-            return null;
-        }
-
-        List<String> neighbors = new ArrayList<String>();
-
-        Vertex v = getVertex(vertex);
-
-        // Loop through outgoing vertex lists
-        for (Vertex neighbor : v.adjacencies) {
-            neighbors.add(neighbor.data);
-        }
-
-        Collections.sort(neighbors); // Sort vertices in alphabetical order
-
-        return neighbors;
+    public List<String> getAllVertices() {
+        return verticesData;
     }
 
     /**
@@ -156,24 +96,18 @@ public class Graph {
         return v.data;
     }
 
-    /////---------------- Private Helper Methods ----------------\\\\\
-
     /**
-     * Checks if graph has vertex with the given string
-     *
-     * @param data string to search for in vertex set
-     * @return true if graph has a vertex with the given string; false otherwise
+     * Get the adjacency list of a vertex 
+     * 
+     * @param vertex to get list for 
+     * @return the adjacency list of vertex
      */
-    private boolean hasVertex(String data) {
-        
-        for (Vertex v : vertices) {
-            if (v.data.equals(data)) {
-                return true;
-            }
-        }
-
-        return false;
+    public List<String> getAdjacencyList(String vertex) {
+        Vertex v = getVertex(vertex);
+        return v.adjacencies;
     }
+
+    /////---------------- Private Helper Methods ----------------\\\\\
 
     /**
      * Gets the vertex node from graph given string
