@@ -1,4 +1,4 @@
 build:
-	javac DFS.java Graph.java
+	javac DFS.java
 run:
 	java DFS
