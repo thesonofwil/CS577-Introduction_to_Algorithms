@@ -175,10 +175,13 @@ public class DFS {
     private static void topOrder(Graph graph) {
         SortedSet<String> visited = new TreeSet<>(); // keep track of visited nodes
         List<String> vertices = graph.getAllVertices(); 
+        StringBuilder result = new StringBuilder(); // store results here
 
         for (String vertex : vertices) {
-            depthFirstSearch(graph, visited, vertex); // Start DFS on first node
+            depthFirstSearch(graph, visited, vertex, result); // Start DFS on first node
         }
+        String output = result.toString(); 
+        System.out.print(output.substring(0, output.length() - 1)); // Get rid of trailing space
     }
 
     /**
@@ -187,8 +190,10 @@ public class DFS {
      * @param graph the graph to search over
      * @param visited list of nodes already visited
      * @param vertex the central node we are traversing from
+     * @param result DFS result stored in string builder
      */
-    private static void depthFirstSearch(Graph graph, SortedSet<String> visited, String vertex) {
+    private static void depthFirstSearch(Graph graph, SortedSet<String> visited, String vertex, 
+    StringBuilder result) {
         Stack<String> s = new Stack<String>();
 
         if (!visited.contains(vertex)) {
@@ -200,7 +205,7 @@ public class DFS {
         
         while(!s.isEmpty()) {
             String u = s.pop();
-            System.out.print(u + " ");
+            result.append(u + " ");
             if (!visited.contains(u)) {
                 visited.add(u);
             }
@@ -223,7 +228,7 @@ public class DFS {
 
         for (Graph graph : graphs) {
             topOrder(graph);
-            System.out.println();
+            System.out.print('\n');
         }
     }
 }
