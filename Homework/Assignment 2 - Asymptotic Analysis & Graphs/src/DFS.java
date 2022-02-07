@@ -1,4 +1,3 @@
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -216,7 +215,7 @@ public class DFS {
             // stack backwards
             for (int i = neighbors.size() - 1; i >= 0; i--) { 
                 String neighbor = neighbors.get(i);
-                if (!visited.contains(neighbor)) {
+                if (!visited.contains(neighbor) && !s.contains(neighbor)) {
                     s.push(neighbor);
                 }
             }
