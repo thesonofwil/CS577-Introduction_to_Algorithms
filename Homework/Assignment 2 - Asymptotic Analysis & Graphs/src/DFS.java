@@ -1,10 +1,11 @@
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Scanner;
-import java.util.SortedSet;
 import java.util.Stack;
-import java.util.TreeSet;
 
 /**
  * Filename:   DFS.java
@@ -21,14 +22,15 @@ public class DFS {
 
     public static class Graph {
 
-        private List<Vertex> vertices;
+        private LinkedHashMap<String, Vertex> vertices;
         private List<String> verticesData;
     
         /*
          * Default no-argument constructor
          */
         public Graph() {
-            vertices = new ArrayList<Vertex>();
+            //vertices = new ArrayList<Vertex>();
+            vertices = new LinkedHashMap<String, Vertex>();
             verticesData = new ArrayList<String>();
         }
     
@@ -39,7 +41,6 @@ public class DFS {
          *
          */
         private class Vertex {
-            String data;
             List<String> adjacencies; // neighbors of the vertex
     
             /**
@@ -47,8 +48,7 @@ public class DFS {
              *
              * @param s String data to hold
              */
-            Vertex (String s) {
-                this.data = s;
+            Vertex () {
                 adjacencies = new ArrayList<String>();
             }
         }
@@ -65,8 +65,8 @@ public class DFS {
          * 2. vertex is not already in the graph 
          */
         public void addVertex(String vertex) {
-            Vertex v = new Vertex(vertex);
-            vertices.add(v);
+            Vertex v = new Vertex();
+            vertices.put(vertex, v);
             verticesData.add(vertex);
         }
     
@@ -99,8 +99,8 @@ public class DFS {
          * @return the first vertex
          */
         public String getFirstVertex() {
-            Vertex v = vertices.get(0);
-            return v.data;
+            List<String> v = verticesData;
+            return v.get(0);
         }
     
         /**
@@ -114,6 +114,7 @@ public class DFS {
             return v.adjacencies;
         }
     
+    
         /////---------------- Private Helper Methods ----------------\\\\\
     
         /**
@@ -123,16 +124,10 @@ public class DFS {
          * @return vertex object with the given string
          */
         private Vertex getVertex(String data) {
-            for (Vertex v : vertices) {
-                if (v.data.equals(data)) {
-                    return v;
-                }
-            }
-    
-            return null;
+            return vertices.get(data);
         }
     }
-
+    
     private static Graph[] graphs; // array of graphs 
 
     private static void parse_input() {
@@ -173,15 +168,18 @@ public class DFS {
      * @param graph the graph to iterate through
      */
     private static void topOrder(Graph graph) {
-        SortedSet<String> visited = new TreeSet<>(); // keep track of visited nodes
+        HashMap<String, String> visited = new HashMap<String, String>(); // track of visited nodes
         List<String> vertices = graph.getAllVertices(); 
         StringBuilder result = new StringBuilder(); // store results here
 
         for (String vertex : vertices) {
-            depthFirstSearch(graph, visited, vertex, result); // Start DFS on first node
+            if (!visited.containsKey(vertex)) {
+                depthFirstSearch(graph, visited, vertex, result); // Start DFS on first node
+            }
         }
+
         String output = result.toString(); 
-        System.out.print(output.substring(0, output.length() - 1)); // Get rid of trailing space
+        System.out.println(output.substring(0, output.length() - 1)); // Get rid of trailing space
     }
 
     /**
@@ -192,31 +190,27 @@ public class DFS {
      * @param vertex the central node we are traversing from
      * @param result DFS result stored in string builder
      */
-    private static void depthFirstSearch(Graph graph, SortedSet<String> visited, String vertex, 
-    StringBuilder result) {
+    private static void depthFirstSearch(Graph graph, HashMap<String, String> visited, 
+    String vertex, StringBuilder result) {
         Stack<String> s = new Stack<String>();
 
-        if (!visited.contains(vertex)) {
-            s.push(vertex); // Push first node onto stack
-            visited.add(vertex);
-        } else { // We've already visited this node
-            return;
-        }
-        
+        s.push(vertex);
+
         while(!s.isEmpty()) {
             String u = s.pop();
-            result.append(u + " ");
-            if (!visited.contains(u)) {
-                visited.add(u);
+            
+            if (!visited.containsKey(u)) {
+                result.append(u + " ");
+                visited.put(u, "1"); // value doesn't matter
             }
 
-            // Add neighbors to stack
+            // Add unvisited neighbors to stack
             List<String> neighbors = graph.getAdjacencyList(u);
             // Since we want lexographical order and neighbors are sorted, we need to push to 
             // stack backwards
             for (int i = neighbors.size() - 1; i >= 0; i--) { 
                 String neighbor = neighbors.get(i);
-                if (!visited.contains(neighbor)) {
+                if (!visited.containsKey(neighbor)) {
                     s.push(neighbor);
                 }
             }
@@ -228,7 +222,6 @@ public class DFS {
 
         for (Graph graph : graphs) {
             topOrder(graph);
-            System.out.print('\n');
         }
     }
 }
