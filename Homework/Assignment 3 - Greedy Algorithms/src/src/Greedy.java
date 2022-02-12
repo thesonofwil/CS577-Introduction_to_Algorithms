@@ -1,8 +1,8 @@
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
+import java.util.HashSet;
 import java.util.PriorityQueue;
 import java.util.Scanner;
+import java.util.Set;
 
 /**
  * Filename:   Greedy.java
@@ -28,6 +28,9 @@ public class Greedy {
         jobs = new PriorityQueue<Job>(numJobs, new JobComparator());
     }
 
+    /**
+     * Representation of a job to be processed with a start time and end time 
+     */
     private class Job {
         private int startTime;
         private int endTime;
@@ -38,13 +41,16 @@ public class Greedy {
         }
     }
 
+    /**
+     * Custom comparator to sort jobs. This one sorts by end time. 
+     */
     private class JobComparator implements Comparator<Job> {
 
         @Override
         public int compare(Greedy.Job j1, Greedy.Job j2) {
-            if (j1.endTime < j2.endTime) {
+            if (j1.endTime > j2.endTime) {
                 return 1;
-            } else if (j1.endTime > j2.endTime) {
+            } else if (j1.endTime < j2.endTime) {
                 return -1;
             }
             return 0;
@@ -90,15 +96,28 @@ public class Greedy {
         jobs.add(j);
     }
 
-    private ArrayList<Job> createSchedule(Greedy g) {
-        return null;
+    /**
+     * Greedy algorithm that grabs jobs based on the earliest finish time heuristic 
+     * 
+     * @return a set of jobs
+     */
+    private Set<Job> createSchedule() {
+        Set<Job> schedule = new HashSet<Job>();
+
+        // Loop through jobs and add to set
+        while (!this.jobs.isEmpty()) {
+            Job earliest = jobs.poll(); // Get the job with highest priority
+            schedule.add(earliest);
+
+            // TODO Need to check for conflicts
+        }
+        return schedule;
     }
 
     public static void main(String[] args) {
         Greedy[] instances = parse_input();
         for (Greedy g : instances) {
-            System.out.println("Test");
-            System.out.println(g.jobs.size());
+            Set<Job> schedule = g.createSchedule();
         }
     }
 }
