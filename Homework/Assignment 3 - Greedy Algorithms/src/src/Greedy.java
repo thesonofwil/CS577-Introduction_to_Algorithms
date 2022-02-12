@@ -1,8 +1,9 @@
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.PriorityQueue;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * Filename:   Greedy.java
@@ -25,7 +26,7 @@ public class Greedy {
      * @param numJobs the number of jobs the priority queue should hold
      */
     public Greedy(int numJobs) {
-        jobs = new PriorityQueue<Job>(numJobs, new JobComparator());
+        jobs = new PriorityQueue<Job>(numJobs, new endTimeComparator());
     }
 
     /**
@@ -42,15 +43,31 @@ public class Greedy {
     }
 
     /**
-     * Custom comparator to sort jobs. This one sorts by end time. 
+     * Custom comparator to sort jobs. This one sorts by increasing end time. 
      */
-    private class JobComparator implements Comparator<Job> {
+    private class endTimeComparator implements Comparator<Job> {
 
         @Override
         public int compare(Greedy.Job j1, Greedy.Job j2) {
             if (j1.endTime > j2.endTime) {
                 return 1;
             } else if (j1.endTime < j2.endTime) {
+                return -1;
+            }
+            return 0;
+        }
+    }
+
+    /**
+     * Custom comparator to sort jobs. This one sorts by increasing start time. 
+     */
+    private class startTimeComparator implements Comparator<Job> {
+
+        @Override
+        public int compare(Greedy.Job j1, Greedy.Job j2) {
+            if (j1.startTime > j2.startTime) {
+                return 1;
+            } else if (j1.startTime < j2.startTime) {
                 return -1;
             }
             return 0;
@@ -97,19 +114,37 @@ public class Greedy {
     }
 
     /**
+     * Checks if there exists a job in the schedule that conflicts with a potential new job
+     * 
+     * @param schedule the set of jobs to examine
+     * @param j job to check against
+     * @return true if there is a conflict
+     */
+    private Boolean checkOverlap(Set<Job> schedule, Job j) {
+        for (Job k : schedule) {
+            if (k.startTime < j.endTime && k.endTime > j.startTime) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Greedy algorithm that grabs jobs based on the earliest finish time heuristic 
      * 
      * @return a set of jobs
      */
     private Set<Job> createSchedule() {
-        Set<Job> schedule = new HashSet<Job>();
+
+        // End schedule ordered by increasing start time
+        SortedSet<Job> schedule = new TreeSet<Job>(new startTimeComparator());
 
         // Loop through jobs and add to set
         while (!this.jobs.isEmpty()) {
             Job earliest = jobs.poll(); // Get the job with highest priority
-            schedule.add(earliest);
-
-            // TODO Need to check for conflicts
+            if (!checkOverlap(schedule, earliest)) {
+                schedule.add(earliest);
+            }
         }
         return schedule;
     }
@@ -118,6 +153,7 @@ public class Greedy {
         Greedy[] instances = parse_input();
         for (Greedy g : instances) {
             Set<Job> schedule = g.createSchedule();
+            System.out.println(schedule.size());
         }
     }
 }
