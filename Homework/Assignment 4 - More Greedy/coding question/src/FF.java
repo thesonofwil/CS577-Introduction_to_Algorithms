@@ -1,15 +1,24 @@
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.PriorityQueue;
+import java.util.Queue;
 import java.util.Scanner;
 
 public class FF {
 	
 	private PriorityQueue<Integer> cache;
-	private HashMap<Integer, Integer> requests; // k = page, v = index
+    private List<Integer> requests;
+	private HashMap<Integer, ArrayList<Integer>> indexMap; // k = page, v = list of indices
+    private int cacheSize;
 	
 	public FF(int numPages, int numRequests) {
-		cache = new PriorityQueue<Integer>(numPages); // ordered by farthest occurrence
-		requests = new HashMap<Integer, Integer>(2 * numRequests);
+		cache = new PriorityQueue<Integer>(numPages, new lastIndexComparator());
+        cacheSize = numPages;
+		requests = new ArrayList<Integer>(numRequests);
+        indexMap = new HashMap<Integer, ArrayList<Integer>>();
 	}
 	
 	/**
@@ -17,13 +26,45 @@ public class FF {
      */
     private class Page {
         private int value; // the actual int
-        private int farthestIndex; // farthest index in request
+        private Queue<Integer> indices; // farthest index in request
     	
         private Page(int value) {
             this.value = value;
+            indices = new LinkedList<Integer>();
         }
     }
 	
+    /**
+     * Custom comparator to pages according to what their next index is in the sequence.
+     *  
+     */
+    private class lastIndexComparator implements Comparator<Integer> {
+
+        @Override
+        public int compare(Integer a, Integer b) {
+            ArrayList<Integer> indicesA = indexMap.get(a);
+            ArrayList<Integer> indicesB = indexMap.get(b);
+
+            // Case 1: int has no more occurrences
+            if (indicesA.isEmpty()) {
+                return -1;
+            } else if (indicesB.isEmpty()) {
+                return 1;
+            }
+
+            // Case 2: int will appear in the future
+            int nextIndexA = indicesA.get(0);
+            int nextIndexB = indicesB.get(0);
+
+            if (nextIndexA < nextIndexB) {
+                return 1;
+            } else if (nextIndexA > nextIndexB) {
+                return -1;
+            }
+            return 0;
+        }
+    }
+    
 	/**
      * Parse stdin and create cache instances
      */
@@ -43,15 +84,46 @@ public class FF {
             // Store sequence of requests and map each one to its index
             for (int i = 0; i < numRequests; i++) {
             	int request = input.nextInt();
-                instances[numInstance].requests.put(i, request);
+                instances[numInstance].requests.add(request);
+
+                // Add page request to index map and update with index as we read sequence
+                if (instances[numInstance].indexMap.containsKey(request)) {
+                    instances[numInstance].indexMap.get(request).add(i);
+                } else {
+                    instances[numInstance].indexMap.put(request, new ArrayList<Integer>());
+                    instances[numInstance].indexMap.get(request).add(i);
+                }
             }
         }
         input.close();
         return instances;
     }
 	
+    private int readPages(FF instance) {
+        int pageFaults = 0;
+
+        for (int page : instance.requests) {
+            if (!instance.cache.contains(page)) {
+                pageFaults++;
+
+                // Need to evict 
+                if (instance.cache.size() == instance.cacheSize) {
+                    instance.cache.poll(); // Remove int with farthest index in future
+                    instance.indexMap.get(page).remove(0); // Update index map
+                    instance.cache.add(page);
+                } else {
+                    instance.indexMap.get(page).remove(0);
+                    instance.cache.add(page);
+                }
+            } 
+        }
+        return pageFaults;
+    }
+
 	public static void main(String[] args) {
 		FF[] instances = parse_input();
-		System.out.println("Hello");
+        for (FF f : instances) {
+            System.out.println(f.readPages(f));
+        }
 	}
 }
