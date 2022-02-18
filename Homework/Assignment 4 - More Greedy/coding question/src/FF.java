@@ -1,15 +1,14 @@
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
+import java.util.LinkedList;
 import java.util.PriorityQueue;
 import java.util.Scanner;
 
 public class FF {
 	
 	private PriorityQueue<Integer> cache; // Cache to hold pages
-    private List<Integer> requests; // Sequence of requests
-	private HashMap<Integer, ArrayList<Integer>> indexMap; // k = page, v = list of indices
+    private int requests[]; // Sequence of requests
+	private HashMap<Integer, LinkedList<Integer>> indexMap; // k = page, v = list of indices
     private int cacheSize; // Size of cache
 	
     /**
@@ -21,8 +20,8 @@ public class FF {
 	public FF(int numPages, int numRequests) {
 		cache = new PriorityQueue<Integer>(numPages, new lastIndexComparator());
         cacheSize = numPages;
-		requests = new ArrayList<Integer>(numRequests);
-        indexMap = new HashMap<Integer, ArrayList<Integer>>();
+		requests = new int[numRequests];
+        indexMap = new HashMap<Integer, LinkedList<Integer>>();
     }
 	
     /**
@@ -33,19 +32,17 @@ public class FF {
 
         @Override
         public int compare(Integer a, Integer b) {
-            ArrayList<Integer> indicesA = indexMap.get(a);
-            ArrayList<Integer> indicesB = indexMap.get(b);
 
             // Case 1: int has no more occurrences
-            if (indicesA.isEmpty()) {
+            if (indexMap.get(a).isEmpty()) {
                 return -1;
-            } else if (indicesB.isEmpty()) {
+            } else if (indexMap.get(b).isEmpty()) {
                 return 1;
             }
 
             // Case 2: int will appear in the future
-            int nextIndexA = indicesA.get(0);
-            int nextIndexB = indicesB.get(0);
+            int nextIndexA = indexMap.get(a).peek();
+            int nextIndexB = indexMap.get(b).peek();;
 
             if (nextIndexA < nextIndexB) {
                 return 1;
@@ -75,13 +72,13 @@ public class FF {
             // Store sequence of requests and map each one to its index
             for (int i = 0; i < numRequests; i++) {
             	int request = input.nextInt();
-                instances[numInstance].requests.add(request);
+                instances[numInstance].requests[i] = request;
 
                 // Add page request to index map and update with index as we read sequence
                 if (instances[numInstance].indexMap.containsKey(request)) {
                     instances[numInstance].indexMap.get(request).add(i);
                 } else {
-                    instances[numInstance].indexMap.put(request, new ArrayList<Integer>());
+                    instances[numInstance].indexMap.put(request, new LinkedList<Integer>());
                     instances[numInstance].indexMap.get(request).add(i);
                 }
             }
@@ -115,7 +112,7 @@ public class FF {
             }  else {
                 instance.indexMap.get(page).remove(0); // update index map
                 
-                // update PQ with new indices
+                // Update PQ with new indices
                 instance.cache.remove(page);
                 instance.cache.add(page);
             }
