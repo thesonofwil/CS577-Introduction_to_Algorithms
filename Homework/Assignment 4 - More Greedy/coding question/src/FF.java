@@ -1,37 +1,28 @@
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
-import java.util.Queue;
 import java.util.Scanner;
 
 public class FF {
 	
-	private PriorityQueue<Integer> cache;
-    private List<Integer> requests;
+	private PriorityQueue<Integer> cache; // Cache to hold pages
+    private List<Integer> requests; // Sequence of requests
 	private HashMap<Integer, ArrayList<Integer>> indexMap; // k = page, v = list of indices
-    private int cacheSize;
+    private int cacheSize; // Size of cache
 	
+    /**
+     * FF constructor
+     * 
+     * @param numPages the size of the cache
+     * @param numRequests the number of integers in the sequence of requests
+     */
 	public FF(int numPages, int numRequests) {
 		cache = new PriorityQueue<Integer>(numPages, new lastIndexComparator());
         cacheSize = numPages;
 		requests = new ArrayList<Integer>(numRequests);
         indexMap = new HashMap<Integer, ArrayList<Integer>>();
-	}
-	
-	/**
-     * Representation of a job to be processed with a start time and end time 
-     */
-    private class Page {
-        private int value; // the actual int
-        private Queue<Integer> indices; // farthest index in request
-    	
-        private Page(int value) {
-            this.value = value;
-            indices = new LinkedList<Integer>();
-        }
     }
 	
     /**
@@ -78,7 +69,7 @@ public class FF {
         for (int numInstance = 0; numInstance < numInstances; numInstance++) {
             int numPages = input.nextInt(); // size of cache
             int numRequests = input.nextInt(); // total size of page requests
-            instances[numInstance] = new FF(numPages, numRequests); // Initialize array of instances
+            instances[numInstance] = new FF(numPages, numRequests); // Create array of instances
             input.nextLine(); // Read the rest of the line to go to the next line
             
             // Store sequence of requests and map each one to its index
@@ -99,6 +90,12 @@ public class FF {
         return instances;
     }
 	
+    /**
+     * Read sequence of integers into cache, evicting using a "Farthest in Future" policy.
+     *
+     * @param instance FF object containing sequence, cache, and indices
+     * @return the number of page faults that occur
+     */
     private int readPages(FF instance) {
         int pageFaults = 0;
 
@@ -115,7 +112,13 @@ public class FF {
                     instance.indexMap.get(page).remove(0);
                     instance.cache.add(page);
                 }
-            } 
+            }  else {
+                instance.indexMap.get(page).remove(0); // update index map
+                
+                // update PQ with new indices
+                instance.cache.remove(page);
+                instance.cache.add(page);
+            }
         }
         return pageFaults;
     }
