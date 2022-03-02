@@ -53,7 +53,7 @@ public class InversionCount {
         int count = 0;
 
         while (!A.isEmpty() && !B.isEmpty()) {
-            if (A.get(0) < B.get(0)) {
+            if (A.get(0) <= B.get(0)) {
                 A.remove(0); // Not an inversion
             } else {
                 B.remove(0);
@@ -73,12 +73,13 @@ public class InversionCount {
      */
     private static int sortAndCount(List<Integer> arr) {
         // Base Case: no inversions if list has one or no elements
-        if (arr.size() == 0 || arr.size() == 1) {
+        if (arr.size() <= 1) {
             return 0;
         }
 
         // Split arr into two halves
-        int k = arr.size() / 2;
+        int k = (arr.size() + 1) / 2;
+    
         List<Integer> A = new ArrayList<Integer>();
         List<Integer> B = new ArrayList<Integer>();
         
@@ -96,7 +97,8 @@ public class InversionCount {
     
         return countA + countB + count;
     }
-	public static void main(String[] args) {
+	
+    public static void main(String[] args) {
 		InversionCount[] instances = parse_input();
         for (InversionCount k : instances) {
             int count = sortAndCount(k.arr);
