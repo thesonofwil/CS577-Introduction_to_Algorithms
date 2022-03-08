@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
 
@@ -29,6 +31,22 @@ public class IntersectionCounter {
         }
     }
     
+    /**
+     * Custom comparator to sort lines by increasing p points.
+     */
+    private static class pComparator implements Comparator<Line> {
+
+        @Override
+        public int compare(IntersectionCounter.Line l1, IntersectionCounter.Line l2) {
+            if (l1.pPoint > l2.pPoint) {
+                return 1;
+            } else if (l1.pPoint < l2.pPoint) {
+                return -1;
+            }
+            return 0;
+        }
+    }
+
 	/**
      * Parse stdin and create instances of IntersectionCounter
      */
@@ -56,9 +74,9 @@ public class IntersectionCounter {
                 instances[numInstance].pSet.add(pPoint);
                 
                 // Create the line and store it
-                // int qPoint = instances[numInstance].qSet.get(p);
-                // Line line = new Line(pPoint, qPoint);
-                // instances[numInstance].lines.add(line);
+                int qPoint = instances[numInstance].qSet.get(p);
+                Line line = new Line(pPoint, qPoint);
+                instances[numInstance].lines.add(line);
             }
         }
 
@@ -69,15 +87,15 @@ public class IntersectionCounter {
     /**
      * Counts the number of inversions between two lists, A and B
      * 
-     * @param A the first list of ints
-     * @param B the second list of ints
+     * @param A the first list of lines
+     * @param B the second list of lines
      * @return the number of inversions detected
      */
-    private static int mergeAndCount(List<Integer> A, List<Integer> B) {
+    private static int mergeAndCount(List<Line> A, List<Line> B) {
         int count = 0;
 
         while (!A.isEmpty() && !B.isEmpty()) {
-            if (A.get(0) <= B.get(0)) {
+            if (A.get(0).qPoint <= B.get(0).qPoint) {
                 A.remove(0); // Not an inversion
             } else {
                 B.remove(0);
@@ -89,13 +107,13 @@ public class IntersectionCounter {
     }
 
     /**
-     * Divide and conquer function which recursively splits an array of ints in halves and counts
+     * Divide and conquer function which recursively splits an array of lines in halves and counts
      * the number of inversions between those two halves
      * 
-     * @param arr the initial array
-     * @return the number of inversions
+     * @param arr the initial array of lines whose p points are already sorted
+     * @return the number of inversions in q, which yields the number of intersections
      */
-    private static int sortAndCount(List<Integer> arr) {
+    private static int divide(List<Line> arr) {
         // Base Case: no inversions if list has one or no elements
         if (arr.size() <= 1) {
             return 0;
@@ -104,8 +122,8 @@ public class IntersectionCounter {
         // Split arr into two halves
         int k = (arr.size() + 1) / 2;
     
-        List<Integer> A = new ArrayList<Integer>();
-        List<Integer> B = new ArrayList<Integer>();
+        List<Line> A = new ArrayList<Line>(); // left half
+        List<Line> B = new ArrayList<Line>(); // right half
         
         for (int i = 0; i < k; i++) {
             A.add(arr.get(i));
@@ -115,8 +133,8 @@ public class IntersectionCounter {
         }
 
         // Recursively split and count inversions in arrays
-        int countA = sortAndCount(A);
-        int countB = sortAndCount(B);
+        int countA = divide(A);
+        int countB = divide(B);
         int count = mergeAndCount(A, B);
     
         return countA + countB + count;
@@ -125,7 +143,9 @@ public class IntersectionCounter {
     public static void main(String[] args) {
 		IntersectionCounter[] instances = parse_input();
         for (IntersectionCounter k : instances) {
-            int count = sortAndCount(k.arr);
+            //sort(k.lines); // sort p by increasing order
+            Collections.sort(k.lines, new pComparator());
+            int count = divide(k.lines);
             System.out.println(count);
         }
 	}
