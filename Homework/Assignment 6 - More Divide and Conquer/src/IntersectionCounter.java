@@ -4,6 +4,16 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * Given a set of line segments whose ends are at y = 0 and y = 1, this program counts the number
+ * of times the lines intersect each other. We use a divide and conquer approach, first sorting
+ * the lines based on their x coordinates, then recursively counting the number of inversions
+ * the resulting set has on their y coordinates.
+ * 
+ * BUGS: since we're counting inversions again, we face the same issues from the last assignment
+ * where the output is not accurate. Tracing through each step, I see how the program underreports
+ * inversions, but I am unsure how to fix it.
+ */
 public class IntersectionCounter {
 	
     private List<Integer> pSet; // points that lie on y = 0
