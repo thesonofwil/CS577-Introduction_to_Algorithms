@@ -1,8 +1,10 @@
 package src;
 
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 import java.util.Scanner;
+import java.util.Set;
 
 /**
  * Filename:   Scheduling.java
@@ -140,6 +142,10 @@ public class Scheduling {
         PriorityQueue<Job> tempJobs = new PriorityQueue<Job>(this.jobs); // Copy of current list
         while (!jobs.isEmpty()) {
             Job k = tempJobs.poll();
+
+            if (k == null) {
+                return null;
+            }
             if (checkOverlap(j, k)) {
                 return k;
             }
@@ -182,10 +188,15 @@ public class Scheduling {
     }
 
     public static void main(String[] args) {
-        Scheduling[] instances = parse_input();
-        for (Scheduling s : instances) {
-            long maxWeight = s.findTotalWeight();
-            System.out.println(maxWeight);
+        try {
+            Scheduling[] instances = parse_input();
+            for (Scheduling s : instances) {
+                long maxWeight = s.findTotalWeight();
+                System.out.println(maxWeight);
+            }
+        }
+        catch(Exception e) {
+            System.out.println(e);
         }
     }
 }
