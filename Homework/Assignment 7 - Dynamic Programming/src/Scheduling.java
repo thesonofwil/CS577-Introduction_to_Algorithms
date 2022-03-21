@@ -1,7 +1,6 @@
-package src;
-
+import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.PriorityQueue;
+import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -17,7 +16,7 @@ import java.util.Scanner;
  */
 public class Scheduling {
 
-    private PriorityQueue<Job> jobs;
+    private List<Job> jobs;
 
     /**
      * Constructor for Scheduling object
@@ -25,7 +24,7 @@ public class Scheduling {
      * @param numJobs the number of jobs the priority queue should hold
      */
     public Scheduling(int numJobs) {
-        jobs = new PriorityQueue<Job>(numJobs, new endTimeComparator());
+        jobs = new ArrayList<Job>();
     }
 
     /**
@@ -137,12 +136,9 @@ public class Scheduling {
      * @return the first compatible job from the list of jobs
      */
     private Job getLatestCompatibleJob(Job j) {
-        PriorityQueue<Job> tempJobs = new PriorityQueue<Job>(this.jobs); // Copy of current list
-        while (!jobs.isEmpty()) {
-            Job k = tempJobs.poll();
-
-            if (k == null) {
-                return null;
+        for (Job k : this.jobs) {
+            if (k == j) {
+                continue;
             }
             if (checkOverlap(j, k)) {
                 return k;
@@ -158,6 +154,8 @@ public class Scheduling {
      */
     private long findTotalWeight() {
 
+        this.jobs.sort(new endTimeComparator()); // sort jobs by decreasing end times
+
         int numJobs = jobs.size();
         
         // base case
@@ -165,21 +163,22 @@ public class Scheduling {
             return 0;
         }
 
-        PriorityQueue<Job> tempJobs = new PriorityQueue<Job>(this.jobs); // Copy of current list
         long[] arr = new long[numJobs]; // stores weight of non-conflicting jobs from 0 to i
-        arr[0] = tempJobs.poll().weight;
+        arr[0] = this.jobs.get(0).weight;
 
         // loop through each job which are pre-sorted and populate array
+        // We track the current max weight at each iteration
         for (int i = 1; i < numJobs; i++) {
-            Job job = tempJobs.poll(); // Get the latest job first
+            Job job = this.jobs.get(i); // Get the latest job first
             long weight = job.weight;
             Job compJob = getLatestCompatibleJob(job);
 
+            // if jobs are compatible, then add the weights
             if (compJob != null) {
                 weight += compJob.weight; 
             }
 
-            arr[i] += Math.max(weight, arr[i  -1]);
+            arr[i] = Math.max(weight, arr[i - 1]);
         }
 
         return arr[numJobs - 1];
