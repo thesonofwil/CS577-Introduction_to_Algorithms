@@ -13,6 +13,8 @@ import java.util.Scanner;
  * Scheduling algorithm for weighted interval scheduling. Given a list of schedules, the 
  * algorithm will determine an optimal schedule and output the total weight of its optimal
  * schedule.
+ * 
+ * BUGS: program doesn't appear to accurately work when there are lots of inputs.
  */
 public class Scheduling {
 
