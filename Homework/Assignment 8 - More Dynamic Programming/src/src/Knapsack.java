@@ -80,7 +80,7 @@ public class Knapsack {
 
         int i;
         for (i = 0; i <= this.numItems; i++) {
-            for (w = 0; i <= this.weightCapacity; w++) {
+            for (int w = 0; i <= this.weightCapacity; w++) {
                 // First row and column are all zeros, which is intialized by default
                 if (i == 0 || w == 0) {
                     continue;
