@@ -3,17 +3,15 @@ import java.util.List;
 import java.util.Scanner;
 
 /**
- * Filename:   Scheduling.java
- * Project:    Assignment 7 - Dynamic Programming
+ * Filename:   Knapsack.java
+ * Project:    Assignment 8 - More Dynamic Programming
  * Authors:    Wilson Tjoeng
  * Course:	   CS577.002
- * Due:		   03/24/22
+ * Due:		   03/30/22
  *
- * Scheduling algorithm for weighted interval scheduling. Given a list of schedules, the
- * algorithm will determine an optimal schedule and output the total weight of its optimal
- * schedule.
- *
- * BUGS: program doesn't appear to accurately work when there are lots of inputs.
+ * Dynammic programming algorithm to solve the Knapsack problem. Given a set of items where each
+ * item has a value and a weight, and a knapsack with a weight capacity, determine the optimal set
+ * of items the knapsack should take and print out its overall value.
  */
 public class Knapsack {
 
@@ -30,7 +28,7 @@ public class Knapsack {
     }
 
     /**
-     * Representation of a job to be processed with a start time and end time
+     * Representation of an item to be potentially added to the knapsack
      */
     private class Item {
         private int weight;
@@ -43,7 +41,7 @@ public class Knapsack {
     }
 
     /**
-     * Parse stdin and create instances with jobs
+     * Parse stdin and create instances of knpasacks and items
      */
     private static Knapsack[] parse_input() {
         Scanner input = new Scanner(System.in);
@@ -56,9 +54,10 @@ public class Knapsack {
             int numItems = input.nextInt(); // Get number of items per intance
             int weightCapacity = input.nextInt();
             instances[numInstance] = new Knapsack(numItems, weightCapacity); // Initialize array of instances
+            instances[numInstance].items.add(null); // add dummy item for matrix
             input.nextLine(); // Read the rest of the line to go to the next line
 
-            // Each line represents a job
+            // Get the weight and value of item and add it to list
             while (numItems > 0) {
                 int weight = input.nextInt();
                 int value = input.nextInt();
@@ -71,16 +70,28 @@ public class Knapsack {
         return instances;
     }
 
+    /**
+     * Creates a new item object and adds it to the knapsack's list
+     * 
+     * @param weight the integer weight of the item
+     * @param value the interger value of the item
+     */
     private void addItem(int weight, int value) {
         Item item = new Item(weight, value);
         this.items.add(item);
     }
 
+    /**
+     * Calculates the optimal set of items that should be added to the knapsack considering its
+     * weight capacity using a DP approach
+     * 
+     * @return the summed value of the optimal set of items
+     */
     private int getMaxValue() {
 
         int i;
         for (i = 0; i <= this.numItems; i++) {
-            for (int w = 0; i <= this.weightCapacity; w++) {
+            for (int w = 0; w <= this.weightCapacity; w++) {
                 // First row and column are all zeros, which is intialized by default
                 if (i == 0 || w == 0) {
                     continue;
@@ -100,7 +111,7 @@ public class Knapsack {
             }
         }
 
-        return this.m[this.numItems][this.weightCapacity];
+        return this.m[this.numItems][this.weightCapacity]; // return last entry
     }
 
     public static void main(String[] args) {
