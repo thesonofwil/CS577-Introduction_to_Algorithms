@@ -1,8 +1,10 @@
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
 
 /**
  * Filename:   Knapsack.java
@@ -36,11 +38,13 @@ public class MaxFlow {
         private int source;
         private int destination;
         private int capacity;
+        private int flow;
 
         private Edge(int source, int destination, int capacity) {
             this.source = source;
             this.destination = destination;
             this.capacity = capacity;
+            this.flow = 0;
         }
     }
 
@@ -84,6 +88,15 @@ public class MaxFlow {
         } else {
             this.adjList.get(source).add(target); // update neighbors
         }
+    }
+
+    private void DFS(int start) {
+        Set<Integer> unvisited = this.adjList.keySet();
+        Set<Integer> visited = new HashSet<Integer>();
+    }
+
+    private void DFSHelper(int n, Set<Integer> unvisited, Set<Integer> visited) {
+
     }
 
     public static void main(String[] args) {
