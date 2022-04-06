@@ -90,19 +90,76 @@ public class MaxFlow {
         }
     }
 
-    private void DFS(int start) {
+    /**
+     * Depth first search. Returns a path from the starting node to the end node. In the case of
+     * a network flow, we'll use this to get the augmented path from s to t.
+     * @param start
+     */
+    private Set<Integer> DFS(int start) {
         Set<Integer> unvisited = this.adjList.keySet();
         Set<Integer> visited = new HashSet<Integer>();
+        Set<Integer> path = new HashSet<Integer>();
+
+        DFSHelper(start, unvisited, visited, path);
+        return path;
     }
 
-    private void DFSHelper(int n, Set<Integer> unvisited, Set<Integer> visited) {
+    private void DFSHelper(int n, Set<Integer> unvisited, Set<Integer> visited, Set<Integer> path) {
+        List<Integer> neighbors = adjList.get(n);
 
+        for (int neighbor : neighbors) {
+            if (!visited.contains(neighbor)) {
+                DFSHelper(n, unvisited, visited, path);
+            }
+        }
+
+        path.add(n);
+        visited.add(n); // mark current node as visited
+    }
+
+    /**
+     * Given a path consisting of nodes, get the minimum flow capacity
+     * from the edges that connect the nodes
+     */
+    private int getMinCapacity(Set<Integer> path) {
+
+        // convert path to array of nodes for ease
+        Integer[] nodes = new Integer[path.size()];
+        nodes = path.toArray(nodes);
+
+        // find and store the edge for each node
+        int minCapacity = Integer.MAX_VALUE;
+        for (int i = 0; i < nodes.length - 1; i++) {
+            Edge e = getEdge(nodes[i], nodes[i + 1]);
+            if (e.capacity < minCapacity) {
+                minCapacity = e.capacity;
+            }
+        }
+
+        return minCapacity;
+    }
+
+    /**
+     * Gets the edge that connects the source and destination nodes
+     * @param source the starting node
+     * @param destination the end node
+     * @return the edge coming out of n, or null if no edge connects the two
+     */
+    private Edge getEdge(int source, int destination) {
+        for (Edge e : edges) {
+            if (e.source == source && e.destination == destination) {
+                return e;
+            }
+        }
+
+        return null;
     }
 
     public static void main(String[] args) {
         try {
             MaxFlow[] instances = parse_input();
             for (MaxFlow m : instances) {
+            
             }
         }
         catch(Exception e) {
