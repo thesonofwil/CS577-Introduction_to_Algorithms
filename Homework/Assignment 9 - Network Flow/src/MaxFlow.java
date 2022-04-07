@@ -14,14 +14,18 @@ import java.util.Set;
  * Due:		   04/07/22
  *
  * Implementation of the Ford-Fulkerson algorithm using DFS to calculate the
- * max flow.
+ * max flow
+ * 
+ * TODO: the biggest outostanding challenge is implementing the residual graph.
+ * This could potentially be achieved through having two graph instances, but it
+ * turns out that is quite difficult to do with nested classes.
  */
 public class MaxFlow {
 
     private int numNodes;
     private int numEdges;
-    int source; // source node - will always be 1
-    int sink; // sink node - the final node so always will be numNodes
+    private int source; // source node - will always be 1
+    private int sink; // sink node - the final node so always will be numNodes
     private Map<Integer, List<Integer>> adjList; // k = node, v = nodes k points to
     private List<Edge> edges;
     private int maxFlow; // the max flow we can achieve
@@ -165,7 +169,9 @@ public class MaxFlow {
         }
         maxFlow += minFlow;
 
-        // After finding a flow, update residual graph
+        // 4. After finding a flow, update residual graph
+        // 5. Repeatedly find an augmenting path in residula graph and update max flow until there
+        // are no more paths left
     }
 
     /**
@@ -189,6 +195,7 @@ public class MaxFlow {
             MaxFlow[] instances = parse_input();
             for (MaxFlow m : instances) {
                 m.fordFulkerson();
+                System.out.println(m.maxFlow);
             }
         }
         catch(Exception e) {
