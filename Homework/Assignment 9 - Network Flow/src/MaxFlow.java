@@ -7,28 +7,33 @@ import java.util.Scanner;
 import java.util.Set;
 
 /**
- * Filename:   Knapsack.java
- * Project:    Assignment 8 - More Dynamic Programming
+ * Filename:   MaxFlow.java
+ * Project:    Assignment 9 - Network Flow
  * Authors:    Wilson Tjoeng
  * Course:	   CS577.002
- * Due:		   03/30/22
+ * Due:		   04/07/22
  *
- * Dynammic programming algorithm to solve the Knapsack problem. Given a set of items where each
- * item has a value and a weight, and a knapsack with a weight capacity, determine the optimal set
- * of items the knapsack should take and print out its overall value.
+ * Implementation of the Ford-Fulkerson algorithm using DFS to calculate the
+ * max flow.
  */
 public class MaxFlow {
 
     private int numNodes;
     private int numEdges;
+    int source; // source node - will always be 1
+    int sink; // sink node - the final node so always will be numNodes
     private Map<Integer, List<Integer>> adjList; // k = node, v = nodes k points to
     private List<Edge> edges;
+    private int maxFlow; // the max flow we can achieve
 
     private MaxFlow(int numNodes, int numEdges) {
         this.numNodes = numNodes;
         this.numEdges = numEdges;
         this.adjList = new HashMap<>();
         this.edges = new ArrayList<Edge>();
+        this.source = 1;
+        this.sink = numNodes;
+        this.maxFlow = 0;
     }
 
     /**
@@ -38,13 +43,12 @@ public class MaxFlow {
         private int source;
         private int destination;
         private int capacity;
-        private int flow;
+        private int backwardsFlow;
 
         private Edge(int source, int destination, int capacity) {
             this.source = source;
             this.destination = destination;
-            this.capacity = capacity;
-            this.flow = 0;
+            this.capacity = capacity;            
         }
     }
 
@@ -64,7 +68,7 @@ public class MaxFlow {
             instances[numInstance] = new MaxFlow(numNodes, numEdges); // Initialize array of instances
             input.nextLine(); // Read the rest of the line to go to the next line
 
-            // Get the weight and value of item and add it to list
+            // Get the edge - the nodes it connects and the capacity
             while (numEdges > 0) {
                 int sourceNode = input.nextInt();
                 int targetNode = input.nextInt();
@@ -72,7 +76,7 @@ public class MaxFlow {
 
                 instances[numInstance].addEdge(sourceNode, targetNode, capacity);
                 numEdges--;
-            }
+            }            
         }
         input.close();
         return instances;
@@ -93,6 +97,7 @@ public class MaxFlow {
     /**
      * Depth first search. Returns a path from the starting node to the end node. In the case of
      * a network flow, we'll use this to get the augmented path from s to t.
+     * 
      * @param start
      */
     private Set<Integer> DFS(int start) {
@@ -108,7 +113,8 @@ public class MaxFlow {
         List<Integer> neighbors = adjList.get(n);
 
         for (int neighbor : neighbors) {
-            if (!visited.contains(neighbor)) {
+            Edge e = getEdge(n, neighbor);
+            if (!visited.contains(neighbor) && e.capacity > 0) {
                 DFSHelper(n, unvisited, visited, path);
             }
         }
@@ -119,24 +125,47 @@ public class MaxFlow {
 
     /**
      * Given a path consisting of nodes, get the minimum flow capacity
-     * from the edges that connect the nodes
+     * from the edges that connect the nodes.
+     * 
+     * @param pathNodes the set containing the nodes of the given path
+     * @param path the set of edges of the path. Initially empty
+     * @return the minimum capacity amongst the edges, as well as the set of edges found during
+     * the path returned as reference
      */
-    private int getMinCapacity(Set<Integer> path) {
+    private int getMinCapacity(Set<Integer> pathNodes, Set<Edge> path) {
 
         // convert path to array of nodes for ease
-        Integer[] nodes = new Integer[path.size()];
-        nodes = path.toArray(nodes);
+        Integer[] nodes = new Integer[pathNodes.size()];
+        nodes = pathNodes.toArray(nodes);
 
         // find and store the edge for each node
         int minCapacity = Integer.MAX_VALUE;
         for (int i = 0; i < nodes.length - 1; i++) {
             Edge e = getEdge(nodes[i], nodes[i + 1]);
+            path.add(e);
             if (e.capacity < minCapacity) {
                 minCapacity = e.capacity;
             }
         }
 
         return minCapacity;
+    }
+
+    private void fordFulkerson() {
+        // 1. Initialize all flows to 0. This is done during constructing the graph
+        // 2. Find a path from source to sink
+        Set<Integer> augmentingPathNodes = DFS(this.source);
+
+        // 3. Get the minimum capacity and update the flow of all edges to the min
+        Set<Edge> augmentingPathEdges = new HashSet<Edge>();
+        int minFlow = getMinCapacity(augmentingPathNodes, augmentingPathEdges);
+        for (Edge e : augmentingPathEdges) {
+            e.backwardsFlow = minFlow;
+            e.capacity = e.capacity - minFlow;
+        }
+        maxFlow += minFlow;
+
+        // After finding a flow, update residual graph
     }
 
     /**
@@ -159,7 +188,7 @@ public class MaxFlow {
         try {
             MaxFlow[] instances = parse_input();
             for (MaxFlow m : instances) {
-            
+                m.fordFulkerson();
             }
         }
         catch(Exception e) {
