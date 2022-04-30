@@ -3,20 +3,49 @@ import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 
+/**
+ * Filename:   ThreeSAT.java
+ * Project:    Assignment 13 - Randomization
+ * Authors:    Wilson Tjoeng
+ * Course:	   CS577.002
+ * Due:		   05/03/22
+ *
+ * A randomized algorithm to solve an instance of the 3-SAT problem. Randomly assigns each variable
+ * a value of true or false. Returns the assignment if at least 7/8 of all clauses is satisfied.
+ */
+
 public class ThreeSAT {
 	
-    private static List<Clause> clauses;
-    private static List<Integer> varAssignments;
+    private static List<Clause> clauses; // collection of clauses with variables
+    private static List<Integer> varAssignments; // assignment for each variable ie -1 or 1
+    private static int numClauses;
+    private static int numVariables;
 	
-	public ThreeSAT(int numClauses, int numVariables) {
-        clauses = new ArrayList<Clause>(numClauses);
-        varAssignments = new ArrayList<Integer>(numVariables);
+    /**
+     * 3SAT constructor
+     * 
+     * @param num_clauses the number of clauses
+     * @param num_variables the number of variables
+     */
+	public ThreeSAT(int num_clauses, int num_variables) {
+        clauses = new ArrayList<Clause>(num_clauses);
+        varAssignments = new ArrayList<Integer>(num_variables);
+        numClauses = num_clauses;
+        numVariables = num_variables;
     }
     
+    /**
+     * Variable/literal that are stored in each clause
+     */
     private class Variable {
         int id;
         boolean negated;
 
+        /**
+         * Variable constructor
+         * 
+         * @param id the numeric id of the variable. If its negative, then the variable is negated
+         */
         private Variable(int id) {
             this.id = Math.abs(id);
             
@@ -28,6 +57,7 @@ public class ThreeSAT {
         }
 
         /**
+         * Checks if the variable is true or false given an assignment
          * 
          * @param assignment how the variable should be assigned, 1 or -1
          * @return true/false if variable is/isn't satisfied
@@ -45,23 +75,38 @@ public class ThreeSAT {
         }
     }
 
+    /**
+     * Clause which consists of multiple variables
+     */
     private class Clause {
         List<Variable> variables;
         List<Boolean> state; // track if after assignment each variable is T/F
 
+        /**
+         * Clause constructor
+         * 
+         * @param numVariables the number of variables to initialize array sizes
+         */
         private Clause(int numVariables) {
             this.variables = new ArrayList<Variable>(numVariables);
             this.state = new ArrayList<Boolean>(numVariables);
         }
 
+        /**
+         * Adds a variable to the clause
+         * @param v the variable object
+         */
         private void addToClause(Variable v) {
             this.variables.add(v);
         }
 
+        /**
+         * Sets the variables in the clause its assigned value given 3SAT.varAssignments
+         * is populated
+         */
         private void setVariables() {
             for (Variable var : this.variables) {
                 int index = var.id - 1;
-                System.out.println("Index: " + index);
                 int assignment = varAssignments.get(index);
                 boolean val = var.getBoolean(assignment);
                 
@@ -108,6 +153,10 @@ public class ThreeSAT {
         input.close();
     }
 	
+    /**
+     * Counts the number of clauses satisfied given variables assigned
+     * @return integer
+     */
     private static int numClausesSatisfied() {
         int count = 0;
 
@@ -127,13 +176,11 @@ public class ThreeSAT {
         Random r = new Random();
         int values[] = {-1, 1};
 
-        for (int i = 0; i < varAssignments.size(); i++) {
-            int num = r.nextInt(1); // randomly generate index of 0 or 1
-            int assignment = values[num];
+        for (int i = 0; i < numVariables; i++) {
+            int num = r.nextInt(2); // randomly generate index of 0 or 1
+            int assignment = values[num]; // assign variable -1 or 1 based on index
             varAssignments.add(i, assignment);
         }
-
-        System.out.println("Assignments: " + varAssignments.toString());
     }
 
     /**
@@ -159,7 +206,7 @@ public class ThreeSAT {
         }
 
         // If we reach this point, we have a good enough assignment
-        for (int i = 0; i < varAssignments.size(); i++) {
+        for (int i = 0; i < numVariables; i++) {
             if (i == varAssignments.size()) {
                 System.out.println(varAssignments.get(i));
             } else {
